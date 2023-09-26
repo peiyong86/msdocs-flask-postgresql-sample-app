@@ -6,10 +6,23 @@ from app import db
 
 class Quota(db.Model):
     __tablename__ = 'quota'
-    id = Column(Integer, primary_key=True)
+    qid = Column(Integer, primary_key=True)
     user = Column(String(50))
-    date_month = Column(String(50))
+    date_month = Column(String(DateTime))
     amount = Column(Integer)
+    # qid = mapped_column(Integer, primary_key=True)
+    # user = mapped_column(String, unique=False, nullable=False)
+    # date_month = mapped_column(String)
+    # amount = mapped_column(Integer)
+
+    def serialize(self):
+        return {
+            'qid': self.qid,
+            'user': self.user,
+            'date_month': self.date_month,
+            'amount': self.amount,
+            # ... additional properties you want to include go here
+        }
 
 #
 # class Restaurant(db.Model):

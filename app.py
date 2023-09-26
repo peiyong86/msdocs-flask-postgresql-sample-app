@@ -6,6 +6,8 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 
+from utils import get_date_month
+
 
 app = Flask(__name__, static_folder='static')
 csrf = CSRFProtect(app)
@@ -47,6 +49,12 @@ def query_quota():
         return jsonify([qo.serialize() for qo in quotas])
     return []
 
+@app.route('/query_quota_all', methods=['GET'])
+def query_quota_all():
+    print('Request for quota')
+    quotas = Quota.query.all()
+    return jsonify([qo.serialize() for qo in quotas])
+
 
 def create_new_quota(username, date_month, amount):
     quota = Quota(user=username, date_month=date_month, amount=amount)
@@ -61,7 +69,7 @@ def increase_quota(username, date_month, amount):
 
 
 @app.route('/add_quota', methods=['POST'])
-def query_quota():
+def add_quota():
     print('Request for quota')
     username = request.args.get('username', None)
     date_month = request.args.get('date_month', None)
@@ -79,8 +87,8 @@ def query_quota():
 @app.route('/use_quota', methods=['POST'])
 def use_quota():
     username = request.args.get('username', None)
-    date_month = request.args.get('date_month', None)
-    amount = request.args.get('amount', 1)
+    date_month = request.args.get('date_month', get_date_month())
+    amount = int(request.args.get('amount', 1))
 
     if username is not None and date_month is not None:
         quota = Quota.query.filter_by(user=username, date_month=date_month).all()
@@ -92,7 +100,6 @@ def use_quota():
         increase_quota(username, date_month, -amount)
         return "ok"
     return "fail"
-
 
 
 
