@@ -40,6 +40,17 @@ class Restaurant(db.Model):
         return self.name
 
 
+class Woods(db.Model):
+    __tablename__ = 'woods'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    street_address = Column(String(50))
+    description = Column(String(250))
+
+    def __str__(self):
+        return self.name
+
+
 # class Review(db.Model):
 #     __tablename__ = 'review'
 #     id = Column(Integer, primary_key=True)
