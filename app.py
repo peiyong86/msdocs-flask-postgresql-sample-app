@@ -27,6 +27,8 @@ app.config.update(
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
 )
 
+# disable csrf
+app.config['WTF_CSRF_ENABLED'] = False
 
 SECRET_KEY = app.config.get('SECRET_KEY')
 
@@ -37,7 +39,8 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
-from models import Quota, Restaurant, Woods
+from models import Quota \
+#, Restaurant, Woods
 
 # The import must be done after db initialization due to circular import issue
 # from models import Restaurant, Review
@@ -68,27 +71,6 @@ def query_quota_all():
         return "secret key check failed!"
     quotas = Quota.query.all()
     return jsonify([qo.serialize() for qo in quotas])
-
-
-@app.route('/query_restaurant_all', methods=['GET'])
-def query_restaurant_all():
-    print('Request for restaurant')
-    if not check_key():
-        return "secret key check failed!"
-    restaurants = Restaurant.query.all()
-    return jsonify([str(qo) for qo in restaurants])
-
-
-
-@app.route('/query_woods_all', methods=['GET'])
-def query_woods_all():
-    print('Request for woods')
-    if not check_key():
-        return "secret key check failed!"
-    restaurants = Woods.query.all()
-    return jsonify([str(qo) for qo in restaurants])
-
-
 
 
 def create_new_quota(username, date_month, amount):
