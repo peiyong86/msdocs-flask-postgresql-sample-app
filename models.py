@@ -8,7 +8,8 @@ class Quota(db.Model):
     __tablename__ = 'quota'
     qid = Column(Integer, primary_key=True)
     user = Column(String(50))
-    date_month = Column(String(DateTime))
+    # date_month = Column(String(DateTime))
+    date_month = Column(String(50))
     amount = Column(Integer)
     # qid = mapped_column(Integer, primary_key=True)
     # user = mapped_column(String, unique=False, nullable=False)
@@ -24,17 +25,21 @@ class Quota(db.Model):
             # ... additional properties you want to include go here
         }
 
-#
-# class Restaurant(db.Model):
-#     __tablename__ = 'restaurant'
-#     id = Column(Integer, primary_key=True)
-#     name = Column(String(50))
-#     street_address = Column(String(50))
-#     description = Column(String(250))
-#
-#     def __str__(self):
-#         return self.name
-#
+    def __str__(self):
+        return self.name
+
+
+class Restaurant(db.Model):
+    __tablename__ = 'restaurant'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(50))
+    street_address = Column(String(50))
+    description = Column(String(250))
+
+    def __str__(self):
+        return self.name
+
+
 # class Review(db.Model):
 #     __tablename__ = 'review'
 #     id = Column(Integer, primary_key=True)
