@@ -27,6 +27,9 @@ app.config.update(
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
 )
 
+
+SECRET_KEY = app.config.get('SECRET_KEY')
+
 # Initialize the database connection
 db = SQLAlchemy(app)
 
@@ -38,11 +41,20 @@ from models import Quota
 
 # The import must be done after db initialization due to circular import issue
 # from models import Restaurant, Review
-
+def check_key():
+    try:
+        secret_key = request.headers.get('X-Secret-Key')
+        if secret_key != SECRET_KEY:
+            return False
+        return True
+    except Exception as e:
+        return False
 
 @app.route('/query_quota', methods=['GET'])
 def query_quota():
     print('Request for quota')
+    if not check_key():
+        return "secret key check failed!"
     username = request.args.get('username', None)
     if username is not None:
         quotas = Quota.query.filter_by(user=username).all()
@@ -52,6 +64,8 @@ def query_quota():
 @app.route('/query_quota_all', methods=['GET'])
 def query_quota_all():
     print('Request for quota')
+    if not check_key():
+        return "secret key check failed!"
     quotas = Quota.query.all()
     return jsonify([qo.serialize() for qo in quotas])
 
@@ -71,6 +85,8 @@ def increase_quota(username, date_month, amount):
 @app.route('/add_quota', methods=['POST'])
 def add_quota():
     print('Request for quota')
+    if not check_key():
+        return "secret key check failed!"
     username = request.args.get('username', None)
     date_month = request.args.get('date_month', None)
     amount = request.args.get('amount', None)
@@ -86,6 +102,9 @@ def add_quota():
 
 @app.route('/use_quota', methods=['POST'])
 def use_quota():
+    print('Request for use quota')
+    if not check_key():
+        return "secret key check failed!"
     username = request.args.get('username', None)
     date_month = request.args.get('date_month', get_date_month())
     amount = int(request.args.get('amount', 1))
