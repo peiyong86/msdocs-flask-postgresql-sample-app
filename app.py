@@ -132,7 +132,7 @@ def use_quota():
                                       model_version=model_version).first()
         if quota.amount <= 0:
             return "Insufficient quota, please contact the administrator.", 100
-        increase_quota(username, date_month, -amount)
+        increase_quota(username, date_month, -amount, model_version)
         return "Ok", 200
     return "Quota check failed.", 400
 
