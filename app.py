@@ -109,7 +109,7 @@ def add_quota():
     return "OK"
 
 
-init_amount={"v3.5": 1000, "v4": 50}
+init_amount={"gpt-3.5-turbo": 1000, "gpt-4": 50}
 
 
 @app.route('/use_quota', methods=['POST'])
@@ -120,7 +120,7 @@ def use_quota():
     username = request.args.get('username', None)
     date_month = request.args.get('date_month', get_date_month())
     amount = int(request.args.get('amount', 1))
-    model_version = request.args.get('model_version', 'v3.5')
+    model_version = request.args.get('model_version', 'gpt-3.5-turbo')
 
     if username is not None and date_month is not None and model_version is not None:
         quota = Quota.query.filter_by(user=username, date_month=date_month, model_version=model_version).all()
