@@ -96,7 +96,7 @@ def add_quota():
         return "secret key check failed!"
     username = request.args.get('username', None)
     date_month = request.args.get('date_month', None)
-    amount = request.args.get('amount', None)
+    amount = int(request.args.get('amount', 50))
     model_version = request.args.get('model_version', None)
     if username is not None and date_month is not None and amount is not None and model_version is not None:
         # 先检查是否有此记录
