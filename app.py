@@ -197,7 +197,7 @@ def call_gpt():
 
     data = request.get_json()
     response = call_gpt_api(data, model_version)
-    return response
+    return response.json()
 
 
 
