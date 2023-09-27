@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 
 from flask import Flask, jsonify, redirect, render_template, request, send_from_directory, url_for
+from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
@@ -10,6 +11,7 @@ from utils import get_date_month
 
 
 app = Flask(__name__, static_folder='static')
+CORS(app)
 csrf = CSRFProtect(app)
 
 # WEBSITE_HOSTNAME exists only in production environment
