@@ -11,6 +11,7 @@ class Quota(db.Model):
     # date_month = Column(String(DateTime))
     date_month = Column(String(50))
     amount = Column(Integer)
+    model_version = Column(String(50))
     # qid = mapped_column(Integer, primary_key=True)
     # user = mapped_column(String, unique=False, nullable=False)
     # date_month = mapped_column(String)
@@ -22,6 +23,7 @@ class Quota(db.Model):
             'user': self.user,
             'date_month': self.date_month,
             'amount': self.amount,
+            'model_version': self.model_version,
             # ... additional properties you want to include go here
         }
 

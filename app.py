@@ -75,14 +75,16 @@ def query_quota_all():
     return jsonify([qo.serialize() for qo in quotas])
 
 
-def create_new_quota(username, date_month, amount):
-    quota = Quota(user=username, date_month=date_month, amount=amount)
+def create_new_quota(username, date_month, amount, model_version):
+    quota = Quota(user=username, date_month=date_month,
+                  amount=amount, model_version=model_version)
     db.session.add(quota)
     db.session.commit()
 
 
-def increase_quota(username, date_month, amount):
-    quota = Quota.query.filter_by(user=username, date_month=date_month).first()
+def increase_quota(username, date_month, amount, model_version):
+    quota = Quota.query.filter_by(user=username, date_month=date_month,
+                                  model_version=model_version).first()
     quota.amount = quota.amount + amount
     db.session.commit()
 
@@ -95,14 +97,19 @@ def add_quota():
     username = request.args.get('username', None)
     date_month = request.args.get('date_month', None)
     amount = request.args.get('amount', None)
-    if username is not None and date_month is not None and amount is not None:
+    model_version = request.args.get('model_version', None)
+    if username is not None and date_month is not None and amount is not None and model_version is not None:
         # 先检查是否有此记录
-        quotas = Quota.query.filter_by(user=username, date_month=date_month).all()
+        quotas = Quota.query.filter_by(user=username,
+                                       date_month=date_month, model_version=model_version).all()
         if len(quotas) == 0:
-            create_new_quota(username, date_month, amount)
+            create_new_quota(username, date_month, amount, model_version)
         else:
-            increase_quota(username, date_month, amount)
+            increase_quota(username, date_month, amount, model_version)
     return "OK"
+
+
+init_amount={"v3.5": 1000, "v4": 50}
 
 
 @app.route('/use_quota', methods=['POST'])
@@ -113,17 +120,21 @@ def use_quota():
     username = request.args.get('username', None)
     date_month = request.args.get('date_month', get_date_month())
     amount = int(request.args.get('amount', 1))
+    model_version = request.args.get('model_version', 'v3.5')
 
-    if username is not None and date_month is not None:
-        quota = Quota.query.filter_by(user=username, date_month=date_month).all()
+    if username is not None and date_month is not None and model_version is not None:
+        quota = Quota.query.filter_by(user=username, date_month=date_month, model_version=model_version).all()
         if len(quota) == 0:
-            return "not found"
-        quota = Quota.query.filter_by(user=username, date_month=date_month).first()
+            create_new_quota(username, date_month, init_amount[model_version], model_version)
+            # return "not found"
+        quota = Quota.query.filter_by(user=username,
+                                      date_month=date_month,
+                                      model_version=model_version).first()
         if quota.amount <= 0:
-            return "fail"
+            return "Insufficient quota, please contact the administrator.", 100
         increase_quota(username, date_month, -amount)
-        return "ok"
-    return "fail"
+        return "Ok", 200
+    return "Quota check failed.", 400
 
 
 
