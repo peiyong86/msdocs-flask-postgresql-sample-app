@@ -35,12 +35,12 @@ app.config['WTF_CSRF_ENABLED'] = False
 SECRET_KEY = app.config.get('SECRET_KEY')
 init_amount={"gpt-3.5-turbo": 1000, "gpt-4": 50}
 apikeys={
-    "gpt-3.5-turbo": app.config["apikey1"],
-    "gpt-4": app.config["apikey2"]
+    "gpt-3.5-turbo": os.getenv("apikey1"),
+    "gpt-4": os.getenv("apikey2")
 }
 apiurls={
-    "gpt-3.5-turbo": app.config["apiurl1"],
-    "gpt-4": app.config["apiurl2"]
+    "gpt-3.5-turbo": os.getenv("apiurl1"),
+    "gpt-4": os.getenv("apiurl2")
 }
 
 
