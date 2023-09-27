@@ -33,6 +33,17 @@ app.config.update(
 app.config['WTF_CSRF_ENABLED'] = False
 
 SECRET_KEY = app.config.get('SECRET_KEY')
+init_amount={"gpt-3.5-turbo": 1000, "gpt-4": 50}
+apikeys={
+    "gpt-3.5-turbo": app.config["apikey1"],
+    "gpt-4": app.config["apikey2"]
+}
+apiurls={
+    "gpt-3.5-turbo": app.config["apiurl1"],
+    "gpt-4": app.config["apiurl2"]
+}
+
+
 
 # Initialize the database connection
 db = SQLAlchemy(app)
@@ -109,7 +120,6 @@ def add_quota():
     return "OK"
 
 
-init_amount={"gpt-3.5-turbo": 1000, "gpt-4": 50}
 
 
 @app.route('/use_quota', methods=['POST'])
@@ -135,6 +145,59 @@ def use_quota():
         increase_quota(username, date_month, -amount, model_version)
         return "Ok"
     return "Quota check failed."
+
+
+
+def check_quota(username, date_month, model_version, amount=1):
+    quota = Quota.query.filter_by(user=username, date_month=date_month, model_version=model_version).all()
+    if len(quota) == 0:
+        create_new_quota(username, date_month, init_amount[model_version], model_version)
+    quota = Quota.query.filter_by(user=username,
+                                  date_month=date_month,
+                                  model_version=model_version).first()
+    if quota.amount <= 0:
+        return False
+        # return "Insufficient quota, please contact the administrator."
+    increase_quota(username, date_month, -amount, model_version)
+    return True
+
+
+import requests
+import json
+
+def call_gpt_api(data, model_version):
+    apikey = apikeys[model_version]
+    url = apiurls[model_version]
+
+    headers = {
+        'Content-Type': 'application/json',
+        'api-key': apikey,
+    }
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    return response
+
+
+@app.route('/call_gpt', methods=['POST'])
+def call_gpt():
+    print('Request for use quota')
+    # check secret key
+    if not check_key():
+        return "secret key check failed!"
+
+    username = request.args.get('username', None)
+    model_version = request.args.get('model_version', 'gpt-3.5-turbo')
+    date_month = get_date_month()
+
+    if username is None:
+        return None
+
+    # check quota
+    if check_quota(username, date_month, model_version) is False:
+        return "Insufficient quota, please contact the administrator."
+
+    data = request.get_json()
+    response = call_gpt_api(data, model_version)
+    return response
 
 
 

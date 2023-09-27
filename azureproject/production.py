@@ -3,6 +3,11 @@ import os
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
 
+apikey1 = os.getenv('apikey1')
+apikey2 = os.getenv('apikey2')
+apiurl1 = os.getenv('apiurl1')
+apiurl2 = os.getenv('apiurl2')
+
 ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME']] if 'WEBSITE_HOSTNAME' in os.environ else []
 CSRF_TRUSTED_ORIGINS = ['https://' + os.environ['WEBSITE_HOSTNAME']] if 'WEBSITE_HOSTNAME' in os.environ else []
 
